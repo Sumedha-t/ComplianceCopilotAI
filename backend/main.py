@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
 from routes.consultation import router as consultation_router
+from routes.documents import router as document_router
 
 app = FastAPI(
     title="Compliance Copilot AI",
@@ -25,3 +26,4 @@ def health():
         "success": True,
         "message": "Backend is healthy."
     }
+app.include_router(document_router)

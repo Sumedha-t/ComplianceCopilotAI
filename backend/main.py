@@ -1,22 +1,27 @@
 from fastapi import FastAPI
 
+from routes.consultation import router as consultation_router
+
 app = FastAPI(
     title="Compliance Copilot AI",
     description="Agentic AI-powered Legal & Regulatory Intelligence Platform",
-    version="1.0.0"
+    version="1.0.0",
 )
+
+app.include_router(consultation_router)
 
 
 @app.get("/")
 def root():
     return {
-        "message": "Compliance Copilot AI Backend is running successfully!"
+        "success": True,
+        "message": "Compliance Copilot AI Backend is running successfully."
     }
 
 
 @app.get("/health")
-def health_check():
+def health():
     return {
-        "status": "healthy",
-        "service": "backend"
+        "success": True,
+        "message": "Backend is healthy."
     }

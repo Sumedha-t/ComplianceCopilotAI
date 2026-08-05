@@ -1,20 +1,43 @@
-# Compliance Copilot AI
+# Compliance Copilot AI - Architecture
 
-## Project Overview
+## Overview
 
-Compliance Copilot AI is an Agentic AI-powered Legal Compliance Platform that assists businesses from company incorporation through continuous compliance monitoring. The platform combines AI agents, Human-in-the-Loop (HITL) lawyer review, and regulatory intelligence to provide proactive legal compliance support.
+Compliance Copilot AI is an Agentic AI-powered legal compliance platform that assists entrepreneurs and businesses in understanding regulatory requirements, evaluating compliance, and generating lawyer-verified recommendations.
 
-## Implemented Scope
+The platform combines multiple specialized AI agents with a Human-in-the-Loop (HITL) review process to provide reliable legal guidance while ensuring that all critical recommendations are reviewed by legal professionals before being delivered to clients.
+
+---
+
+## Architecture Components
 
 - Client Portal
 - Lawyer Portal
-- AI Agents
-- Human-in-the-Loop
-- Compliance Dashboard
+- FastAPI Backend
+- AI Agent Layer
+- Rule Engine
+- Compliance Knowledge Base
+- SQLite Database
 
-## Future Scope
+---
 
-- Admin Portal
-- Government API Integration
-- Automated Report Generation
-- Knowledge Graph
+## AI Agents
+
+- Business Consultation Agent
+- Business Profiling Agent
+- Registration Planning Agent
+- Document Intelligence Agent
+- Regulation Mapping Agent
+- Compliance Audit Agent
+- Citation Verification Agent
+- Risk Prediction Agent
+- Recommendation Agent
+
+---
+
+## Architecture Documents
+
+- High-Level Architecture
+- Low-Level Architecture
+- AI Agent Collaboration
+- Human-in-the-Loop Workflow
+- Deployment Architecture

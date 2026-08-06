@@ -6,22 +6,24 @@ from sqlalchemy import String
 from database.database import Base
 
 
-class Document(Base):
+class LawyerNote(Base):
     """
-    Stores uploaded company documents.
+    Stores lawyer comments and approvals.
     """
 
-    __tablename__ = "documents"
+    __tablename__ = "lawyer_notes"
 
-    document_id = Column(Integer, primary_key=True, index=True)
+    note_id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
 
     company_id = Column(
         Integer,
         ForeignKey("companies.company_id")
     )
 
-    filename = Column(String)
+    lawyer_name = Column(String)
 
-    document_type = Column(String)
-
-    status = Column(String)
+    note = Column(String)

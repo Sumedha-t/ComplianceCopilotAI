@@ -1,4 +1,5 @@
-from agents.business_consultation import BusinessConsultationAgent
+from orchestrator.workflow import WorkflowOrchestrator
+
 from schemas.consultation_schema import (
     ConsultationRequest,
     ConsultationData,
@@ -7,29 +8,33 @@ from schemas.consultation_schema import (
 
 
 class ConsultationService:
-    """
-    Service responsible for coordinating the
-    Business Consultation workflow.
-    """
 
     def __init__(self):
-        self.agent = BusinessConsultationAgent()
 
-    def process(self, consultation: ConsultationRequest) -> ConsultationResponse:
-        """
-        Process a business consultation request.
-        """
+        self.workflow = WorkflowOrchestrator()
 
-        recommendation = self.agent.run(consultation)
+    def process(
+        self,
+        consultation: ConsultationRequest,
+    ) -> ConsultationResponse:
 
-        response = ConsultationResponse(
+        recommendation = self.workflow.start_workflow(
+            "new_business",
+            consultation
+        )
+
+        return ConsultationResponse(
             success=True,
             message="Business consultation completed successfully.",
             data=ConsultationData(
-                recommended_structure=recommendation["recommended_structure"],
-                required_registrations=recommendation["required_registrations"],
-                reason=recommendation["reason"],
+                recommended_structure=recommendation[
+                    "recommended_structure"
+                ],
+                required_registrations=recommendation[
+                    "required_registrations"
+                ],
+                reason=recommendation[
+                    "reason"
+                ],
             ),
         )
-
-        return response

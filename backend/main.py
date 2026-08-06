@@ -2,6 +2,14 @@ from fastapi import FastAPI
 
 from routes.consultation import router as consultation_router
 from routes.documents import router as document_router
+from database.database import Base
+from database.database import engine
+
+from models.company import Company
+from models.document import Document
+from models.compliance import Compliance
+from models.recommendation import Recommendation
+from models.lawyer_note import LawyerNote
 
 app = FastAPI(
     title="Compliance Copilot AI",
@@ -26,4 +34,5 @@ def health():
         "success": True,
         "message": "Backend is healthy."
     }
+Base.metadata.create_all(bind=engine)
 app.include_router(document_router)

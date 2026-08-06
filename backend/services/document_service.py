@@ -1,27 +1,24 @@
-from agents.document_intelligence import DocumentIntelligenceAgent
-from models.session_context import SessionContext
+from orchestrator.workflow import WorkflowOrchestrator
 
 
 class DocumentService:
 
     def __init__(self):
 
-        self.agent = DocumentIntelligenceAgent()
+        self.workflow = WorkflowOrchestrator()
 
     def process(
         self,
-        filename: str
+        filename,
     ):
 
-        context = SessionContext()
-
-        context = self.agent.run(
-            context,
+        context = self.workflow.start_workflow(
+            "existing_business",
             filename
         )
 
         return {
             "success": True,
             "message": "Document uploaded successfully.",
-            "data": context.to_dict()
+            "data": context.to_dict(),
         }

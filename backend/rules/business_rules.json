@@ -1,0 +1,64 @@
+{
+    "company_structures": [
+        {
+            "name": "Sole Proprietorship",
+            "conditions": {
+                "min_founders": 1,
+                "max_founders": 1,
+                "max_employees": 10,
+                "max_turnover": 5000000
+            },
+            "required_registrations": [
+                "PAN",
+                "GST (if applicable)",
+                "Shop & Establishment Registration"
+            ],
+            "reason": "Suitable for a single owner operating a small business."
+        },
+        {
+            "name": "Partnership Firm",
+            "conditions": {
+                "min_founders": 2,
+                "max_founders": 20,
+                "max_employees": 20,
+                "max_turnover": 10000000
+            },
+            "required_registrations": [
+                "PAN",
+                "GST",
+                "Partnership Deed"
+            ],
+            "reason": "Suitable for businesses owned by two or more partners."
+        },
+        {
+            "name": "Limited Liability Partnership (LLP)",
+            "conditions": {
+                "min_founders": 2,
+                "max_founders": 20
+            },
+            "required_registrations": [
+                "PAN",
+                "GST",
+                "LLP Registration",
+                "DIN",
+                "DSC"
+            ],
+            "reason": "Provides limited liability while maintaining operational flexibility."
+        },
+        {
+            "name": "Private Limited Company",
+            "conditions": {
+                "min_founders": 2
+            },
+            "required_registrations": [
+                "PAN",
+                "GST",
+                "Certificate of Incorporation",
+                "DIN",
+                "DSC",
+                "MSME (Optional)"
+            ],
+            "reason": "Recommended for scalable businesses with multiple founders and future investment plans."
+        }
+    ]
+}

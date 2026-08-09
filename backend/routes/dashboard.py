@@ -19,20 +19,136 @@ router = APIRouter(
 )
 
 
-def parse_json(value, default):
+def parse_json(value, default=None):
+    """
+    Convert stored JSON strings into Python objects.
+    """
+    if default is None:
+        default = []
 
-    if not value:
+    if value is None or value == "":
         return default
+
+    # Already decoded
+    if isinstance(value, (list, dict)):
+        return value
 
     try:
         return json.loads(value)
-
     except (json.JSONDecodeError, TypeError):
         return default
 
 
+# =========================================================
+# CLIENT / COMPANY LIST
+# =========================================================
+
+@router.get("/companies")
+async def get_companies():
+    """
+    Return all companies for the lawyer/client dashboard.
+
+    Used by the frontend to display the client list before
+    opening an individual company dashboard.
+    """
+
+    db = SessionLocal()
+
+    try:
+
+        companies = (
+            db.query(Company)
+            .order_by(
+                Company.company_name.asc()
+            )
+            .all()
+        )
+
+        result = []
+
+        for company in companies:
+
+            # ---------------------------------------------
+            # Latest compliance report
+            # ---------------------------------------------
+
+            latest_report = (
+                db.query(ComplianceReport)
+                .filter(
+                    ComplianceReport.company_id
+                    == company.id
+                )
+                .order_by(
+                    ComplianceReport.created_at.desc()
+                )
+                .first()
+            )
+
+            # ---------------------------------------------
+            # Active regulatory alerts
+            # ---------------------------------------------
+
+            alert_count = (
+                db.query(RegulatoryAlert)
+                .filter(
+                    RegulatoryAlert.company_id
+                    == company.id,
+                    RegulatoryAlert.status
+                    == "re-audit_required"
+                )
+                .count()
+            )
+
+            result.append(
+                {
+                    "id": company.id,
+
+                    "company_name":
+                        company.company_name,
+
+                    "industry":
+                        company.industry,
+
+                    "state":
+                        company.state,
+
+                    "compliance_score": (
+                        latest_report.compliance_score
+                        if latest_report
+                        else None
+                    ),
+
+                    "risk_level": (
+                        latest_report.risk_level
+                        if latest_report
+                        else None
+                    ),
+
+                    "regulatory_alerts":
+                        alert_count,
+                }
+            )
+
+        return {
+            "success": True,
+            "data": result
+        }
+
+    finally:
+        db.close()
+
+
+# =========================================================
+# INDIVIDUAL COMPANY DASHBOARD
+# =========================================================
+
 @router.get("/{company_id}")
-async def get_company_dashboard(company_id: int):
+async def get_company_dashboard(
+    company_id: int
+):
+    """
+    Return the complete dashboard information for one company.
+    """
 
     db = SessionLocal()
 
@@ -44,7 +160,9 @@ async def get_company_dashboard(company_id: int):
 
         company = (
             db.query(Company)
-            .filter(Company.id == company_id)
+            .filter(
+                Company.id == company_id
+            )
             .first()
         )
 
@@ -127,19 +245,51 @@ async def get_company_dashboard(company_id: int):
 
             "data": {
 
+                # =========================================
+                # COMPANY
+                # =========================================
+
                 "company": {
-                    "id": company.id,
-                    "company_name": company.company_name,
-                    "cin": company.cin,
-                    "pan": company.pan,
-                    "gstin": company.gstin,
-                    "business_type": company.business_type,
-                    "industry": company.industry,
-                    "state": company.state,
+
+                    "id":
+                        company.id,
+
+                    "company_name":
+                        company.company_name,
+
+                    "cin":
+                        company.cin,
+
+                    "pan":
+                        company.pan,
+
+                    "gstin":
+                        company.gstin,
+
+                    "business_type":
+                        company.business_type,
+
+                    "industry":
+                        company.industry,
+
+                    "state":
+                        company.state,
+
+                    "created_at":
+                        company.created_at,
+
+                    "updated_at":
+                        company.updated_at,
                 },
 
+                # =========================================
+                # COMPLIANCE
+                # =========================================
+
                 "compliance": (
+
                     {
+
                         "compliance_score":
                             compliance_report.compliance_score,
 
@@ -167,65 +317,106 @@ async def get_company_dashboard(company_id: int):
                         "created_at":
                             compliance_report.created_at,
                     }
+
                     if compliance_report
+
                     else None
                 ),
 
+                # =========================================
+                # DOCUMENTS
+                # =========================================
+
                 "documents": [
+
                     {
-                        "id": document.id,
-                        "filename": document.filename,
+                        "id":
+                            document.id,
+
+                        "filename":
+                            document.filename,
+
                         "document_type":
                             document.document_type,
-                        "status": document.status,
+
+                        "status":
+                            document.status,
+
                         "uploaded_at":
                             document.uploaded_at,
                     }
+
                     for document in documents
                 ],
 
+                # =========================================
+                # RECOMMENDATIONS
+                # =========================================
+
                 "recommendations": [
+
                     {
-                        "id": recommendation.id,
+                        "id":
+                            recommendation.id,
+
                         "document":
                             recommendation.document,
+
                         "priority":
                             recommendation.priority,
+
                         "action":
                             recommendation.action,
+
                         "reason":
                             recommendation.reason,
+
                         "next_step":
                             recommendation.next_step,
+
                         "created_at":
                             recommendation.created_at,
                     }
+
                     for recommendation in recommendations
                 ],
 
+                # =========================================
+                # REGULATORY ALERTS
+                # =========================================
+
                 "regulatory_alerts": [
+
                     {
-                        "id": alert.id,
+                        "id":
+                            alert.id,
+
                         "update_id":
                             alert.update_id,
+
                         "authority":
                             alert.authority,
+
                         "title":
                             alert.title,
+
                         "severity":
                             alert.severity,
+
                         "affected_document":
                             alert.affected_document,
+
                         "status":
                             alert.status,
+
                         "created_at":
                             alert.created_at,
                     }
+
                     for alert in regulatory_alerts
                 ],
             }
         }
 
     finally:
-
         db.close()

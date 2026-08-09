@@ -1,3 +1,4 @@
+@'
 {
     "updates": [
         {
@@ -21,6 +22,18 @@
             "affected_document": "Fire NOC",
             "severity": "High",
             "change_summary": "Updated fire safety requirements require affected industrial facilities to review their current fire safety approvals."
+        },
+        {
+            "update_id": "REG-003",
+            "authority": "Karnataka Regulatory Authority",
+            "title": "Updated compliance documentation requirements for manufacturing businesses",
+            "effective_date": "2026-11-01",
+            "affected_state": "Karnataka",
+            "affected_industry": "Manufacturing",
+            "affected_document": "Factory License",
+            "severity": "Medium",
+            "change_summary": "Manufacturing businesses must review applicable compliance documentation requirements following the regulatory update."
         }
     ]
 }
+'@ | Set-Content .\regulatory_sources\regulatory_updates.json -Encoding UTF8

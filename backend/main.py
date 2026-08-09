@@ -14,6 +14,9 @@ from routes.regulatory import router as regulatory_router
 from routes.dashboard import router as dashboard_router
 from routes.reports import router as reports_router
 from routes.clients import router as clients_router
+from routes.hitl import router as hitl_router
+from routes.action_plan import router as action_plan_router
+from routes.actions import router as actions_router
 
 app = FastAPI(
     title="Compliance Copilot AI",
@@ -44,3 +47,6 @@ app.include_router(regulatory_router)
 app.include_router(dashboard_router)
 app.include_router(reports_router)
 app.include_router(clients_router)
+app.include_router(hitl_router)
+app.include_router(action_plan_router)
+app.include_router(actions_router)

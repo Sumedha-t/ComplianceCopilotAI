@@ -189,6 +189,35 @@ class Recommendation(Base):
         Text,
         nullable=True
     )
+    effective_action = Column(
+    Text,
+    nullable=True
+    )
+
+    # =====================================================
+    # HITL / LAWYER REVIEW
+    # =====================================================
+
+    review_status = Column(
+        String(50),
+        nullable=False,
+        default="pending"
+    )
+
+    lawyer_action = Column(
+        Text,
+        nullable=True
+    )
+
+    lawyer_note = Column(
+        Text,
+        nullable=True
+    )
+
+    reviewed_at = Column(
+        DateTime,
+        nullable=True
+    )
 
     created_at = Column(
         DateTime,
@@ -198,6 +227,30 @@ class Recommendation(Base):
     company = relationship(
         "Company",
         back_populates="recommendations"
+    )
+    # =====================================================
+    # PHASE C - ACTION EXECUTION
+    # =====================================================
+
+    action_status = Column(
+        String(50),
+        nullable=False,
+        default="pending"
+    )
+
+    action_started_at = Column(
+        DateTime,
+        nullable=True
+    )
+
+    action_completed_at = Column(
+        DateTime,
+        nullable=True
+    )
+
+    action_blocked_reason = Column(
+        Text,
+        nullable=True
     )
 
 
@@ -240,6 +293,20 @@ class RegulatoryAlert(Base):
     status = Column(
         String(50),
         default="new"
+    )
+
+    # =====================================================
+    # HITL / LAWYER REVIEW
+    # =====================================================
+
+    lawyer_note = Column(
+        Text,
+        nullable=True
+    )
+
+    acknowledged_at = Column(
+        DateTime,
+        nullable=True
     )
 
     created_at = Column(

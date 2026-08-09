@@ -21,3 +21,17 @@ SessionLocal = sessionmaker(
 
 
 Base = declarative_base()
+
+
+def get_db():
+    """
+    Provide a database session for FastAPI routes.
+    The session is automatically closed after the request.
+    """
+    db = SessionLocal()
+
+    try:
+        yield db
+
+    finally:
+        db.close()

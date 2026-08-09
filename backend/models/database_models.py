@@ -55,6 +55,13 @@ class Company(Base):
         cascade="all, delete-orphan"
     )
 
+    new_business_profile = relationship(
+        "NewBusinessProfile",
+        back_populates="company",
+        uselist=False,
+        cascade="all, delete-orphan"
+    )
+
 
 class Document(Base):
     __tablename__ = "documents"
@@ -243,4 +250,81 @@ class RegulatoryAlert(Base):
     company = relationship(
         "Company",
         back_populates="regulatory_alerts"
+    )
+
+
+class NewBusinessProfile(Base):
+    """
+    Stores the initial compliance/readiness assessment
+    generated for a newly consulted business.
+
+    This is separate from ComplianceReport because a new
+    business may have no documents yet and therefore does
+    not have an audited compliance score.
+    """
+
+    __tablename__ = "new_business_profiles"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    company_id = Column(
+        Integer,
+        ForeignKey("companies.id"),
+        nullable=False,
+        unique=True
+    )
+
+    recommended_structure = Column(
+        String(150),
+        nullable=False
+    )
+
+    required_registrations = Column(
+        Text,
+        nullable=True
+    )
+
+    industry_compliance = Column(
+        Text,
+        nullable=True
+    )
+
+    state_compliance = Column(
+        Text,
+        nullable=True
+    )
+
+    initial_compliance_checklist = Column(
+        Text,
+        nullable=True
+    )
+
+    next_steps = Column(
+        Text,
+        nullable=True
+    )
+
+    reason = Column(
+        Text,
+        nullable=True
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow
+    )
+
+    updated_at = Column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
+
+    company = relationship(
+        "Company",
+        back_populates="new_business_profile"
     )

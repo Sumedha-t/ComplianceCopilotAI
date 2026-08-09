@@ -10,6 +10,7 @@ from models.database_models import (
     ComplianceReport,
     Recommendation,
     RegulatoryAlert,
+    NewBusinessProfile,
 )
 
 
@@ -23,18 +24,19 @@ def parse_json(value, default=None):
     """
     Convert stored JSON strings into Python objects.
     """
+
     if default is None:
         default = []
 
     if value is None or value == "":
         return default
 
-    # Already decoded
     if isinstance(value, (list, dict)):
         return value
 
     try:
         return json.loads(value)
+
     except (json.JSONDecodeError, TypeError):
         return default
 
@@ -48,8 +50,9 @@ async def get_companies():
     """
     Return all companies for the lawyer/client dashboard.
 
-    Used by the frontend to display the client list before
-    opening an individual company dashboard.
+    Supports both:
+    1. Existing businesses with compliance audits
+    2. New businesses created through consultation
     """
 
     db = SessionLocal()
@@ -85,7 +88,20 @@ async def get_companies():
             )
 
             # ---------------------------------------------
-            # Active regulatory alerts
+            # New business profile
+            # ---------------------------------------------
+
+            new_business_profile = (
+                db.query(NewBusinessProfile)
+                .filter(
+                    NewBusinessProfile.company_id
+                    == company.id
+                )
+                .first()
+            )
+
+            # ---------------------------------------------
+            # Regulatory alerts
             # ---------------------------------------------
 
             alert_count = (
@@ -99,9 +115,38 @@ async def get_companies():
                 .count()
             )
 
+            # ---------------------------------------------
+            # Determine client type
+            # ---------------------------------------------
+
+            if new_business_profile:
+
+                client_type = "new_business"
+
+            else:
+
+                client_type = "existing_business"
+
+            # ---------------------------------------------
+            # Determine compliance status
+            # ---------------------------------------------
+
+            if latest_report:
+
+                compliance_status = "audited"
+
+            elif new_business_profile:
+
+                compliance_status = "not_yet_audited"
+
+            else:
+
+                compliance_status = "not_yet_audited"
+
             result.append(
                 {
-                    "id": company.id,
+                    "id":
+                        company.id,
 
                     "company_name":
                         company.company_name,
@@ -111,6 +156,15 @@ async def get_companies():
 
                     "state":
                         company.state,
+
+                    "business_type":
+                        company.business_type,
+
+                    "client_type":
+                        client_type,
+
+                    "compliance_status":
+                        compliance_status,
 
                     "compliance_score": (
                         latest_report.compliance_score
@@ -135,6 +189,7 @@ async def get_companies():
         }
 
     finally:
+
         db.close()
 
 
@@ -147,7 +202,9 @@ async def get_company_dashboard(
     company_id: int
 ):
     """
-    Return the complete dashboard information for one company.
+    Return complete dashboard information for one company.
+
+    Supports both existing-business and new-business clients.
     """
 
     db = SessionLocal()
@@ -205,6 +262,19 @@ async def get_company_dashboard(
         )
 
         # -------------------------------------------------
+        # NEW BUSINESS PROFILE
+        # -------------------------------------------------
+
+        new_business_profile = (
+            db.query(NewBusinessProfile)
+            .filter(
+                NewBusinessProfile.company_id
+                == company_id
+            )
+            .first()
+        )
+
+        # -------------------------------------------------
         # RECOMMENDATIONS
         # -------------------------------------------------
 
@@ -237,13 +307,108 @@ async def get_company_dashboard(
         )
 
         # -------------------------------------------------
+        # CLIENT TYPE
+        # -------------------------------------------------
+
+        if new_business_profile:
+
+            client_type = "new_business"
+
+        else:
+
+            client_type = "existing_business"
+
+        # -------------------------------------------------
+        # COMPLIANCE STATUS
+        # -------------------------------------------------
+
+        if compliance_report:
+
+            compliance_status = "audited"
+
+        elif new_business_profile:
+
+            compliance_status = "not_yet_audited"
+
+        else:
+
+            compliance_status = "not_yet_audited"
+
+        # -------------------------------------------------
+        # NEW BUSINESS PROFILE RESPONSE
+        # -------------------------------------------------
+
+        new_business_data = None
+
+        if new_business_profile:
+
+            new_business_data = {
+
+                "id":
+                    new_business_profile.id,
+
+                "recommended_structure":
+                    new_business_profile.recommended_structure,
+
+                "required_registrations":
+                    parse_json(
+                        new_business_profile.required_registrations,
+                        []
+                    ),
+
+                "industry_compliance":
+                    parse_json(
+                        new_business_profile.industry_compliance,
+                        []
+                    ),
+
+                "state_compliance":
+                    parse_json(
+                        new_business_profile.state_compliance,
+                        []
+                    ),
+
+                "initial_compliance_checklist":
+                    parse_json(
+                        new_business_profile.initial_compliance_checklist,
+                        []
+                    ),
+
+                "next_steps":
+                    parse_json(
+                        new_business_profile.next_steps,
+                        []
+                    ),
+
+                "reason":
+                    new_business_profile.reason,
+
+                "created_at":
+                    new_business_profile.created_at,
+
+                "updated_at":
+                    new_business_profile.updated_at,
+            }
+
+        # -------------------------------------------------
         # RESPONSE
         # -------------------------------------------------
 
         return {
+
             "success": True,
 
             "data": {
+
+                # =========================================
+                # CLIENT METADATA
+                # =========================================
+
+                "client_type":
+                    client_type,
+
+                "compliance_status":
+                    compliance_status,
 
                 # =========================================
                 # COMPANY
@@ -322,6 +487,13 @@ async def get_company_dashboard(
 
                     else None
                 ),
+
+                # =========================================
+                # NEW BUSINESS READINESS
+                # =========================================
+
+                "new_business_profile":
+                    new_business_data,
 
                 # =========================================
                 # DOCUMENTS
@@ -419,4 +591,5 @@ async def get_company_dashboard(
         }
 
     finally:
+
         db.close()

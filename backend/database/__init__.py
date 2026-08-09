@@ -1,9 +1,8 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import declarative_base, sessionmaker
 
 
-DATABASE_URL = "sqlite:///compliance.db"
+DATABASE_URL = "sqlite:///./compliance.db"
 
 
 engine = create_engine(
@@ -17,7 +16,6 @@ engine = create_engine(
 SessionLocal = sessionmaker(
     autocommit=False,
     autoflush=False,
-    expire_on_commit=False,
     bind=engine
 )
 

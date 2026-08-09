@@ -24,17 +24,53 @@ class ConsultationService:
         )
 
         return ConsultationResponse(
+
             success=True,
-            message="Business consultation completed successfully.",
+
+            message=(
+                "Business consultation and initial "
+                "compliance assessment completed successfully."
+            ),
+
             data=ConsultationData(
-                recommended_structure=recommendation[
-                    "recommended_structure"
-                ],
-                required_registrations=recommendation[
-                    "required_registrations"
-                ],
-                reason=recommendation[
-                    "reason"
-                ],
+
+                recommended_structure=
+                    recommendation[
+                        "recommended_structure"
+                    ],
+
+                required_registrations=
+                    recommendation[
+                        "required_registrations"
+                    ],
+
+                industry_compliance=
+                    recommendation.get(
+                        "industry_compliance",
+                        []
+                    ),
+
+                state_compliance=
+                    recommendation.get(
+                        "state_compliance",
+                        []
+                    ),
+
+                initial_compliance_checklist=
+                    recommendation.get(
+                        "initial_compliance_checklist",
+                        []
+                    ),
+
+                next_steps=
+                    recommendation.get(
+                        "next_steps",
+                        []
+                    ),
+
+                reason=
+                    recommendation[
+                        "reason"
+                    ],
             ),
         )

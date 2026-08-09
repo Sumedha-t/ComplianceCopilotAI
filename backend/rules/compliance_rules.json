@@ -1,0 +1,51 @@
+{
+    "prototype_ruleset": true,
+    "description": "Demo compliance rules for the hackathon prototype. These rules are not legal advice.",
+    "company_types": {
+        "Private Limited Company": {
+            "required_documents": [
+                {
+                    "document_type": "Certificate of Incorporation",
+                    "weight": 25,
+                    "reason": "Confirms legal incorporation of the company."
+                },
+                {
+                    "document_type": "GST Registration",
+                    "weight": 25,
+                    "reason": "Confirms GST registration for the business."
+                },
+                {
+                    "document_type": "Factory License",
+                    "weight": 20,
+                    "reason": "Required for the manufacturing business in this prototype."
+                },
+                {
+                    "document_type": "Fire NOC",
+                    "weight": 15,
+                    "reason": "Required for the manufacturing facility in this prototype."
+                },
+                {
+                    "document_type": "Pollution Control Certificate",
+                    "weight": 10,
+                    "reason": "Required for the manufacturing activity in this prototype."
+                },
+                {
+                    "document_type": "MSME Certificate",
+                    "weight": 5,
+                    "reason": "Recommended registration for the demo company."
+                }
+            ]
+        }
+    },
+    "risk_levels": {
+        "Low": {
+            "minimum_score": 80
+        },
+        "Medium": {
+            "minimum_score": 60
+        },
+        "High": {
+            "minimum_score": 0
+        }
+    }
+}

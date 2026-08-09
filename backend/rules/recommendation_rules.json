@@ -1,0 +1,41 @@
+{
+    "prototype_ruleset": true,
+    "recommendations": {
+        "Fire NOC": {
+            "priority": "High",
+            "action": "Obtain Fire NOC",
+            "reason": "The Fire NOC is currently missing from the uploaded compliance documents.",
+            "next_step": "Obtain the required fire safety approval for the facility and upload the issued document."
+        },
+        "Pollution Control Certificate": {
+            "priority": "High",
+            "action": "Obtain Pollution Control Certificate",
+            "reason": "The Pollution Control Certificate is currently missing from the uploaded compliance documents.",
+            "next_step": "Obtain the applicable pollution control approval and upload the issued certificate."
+        },
+        "GST Registration": {
+            "priority": "High",
+            "action": "Complete GST Registration",
+            "reason": "GST registration is required for the current prototype business profile.",
+            "next_step": "Complete the applicable GST registration process and upload the certificate."
+        },
+        "Factory License": {
+            "priority": "High",
+            "action": "Obtain Factory License",
+            "reason": "The factory license is required for the manufacturing business in this prototype.",
+            "next_step": "Obtain the applicable factory license and upload the issued document."
+        },
+        "Certificate of Incorporation": {
+            "priority": "High",
+            "action": "Complete Company Incorporation",
+            "reason": "Proof of incorporation is required to establish the company's legal identity.",
+            "next_step": "Complete incorporation and upload the Certificate of Incorporation."
+        },
+        "MSME Certificate": {
+            "priority": "Medium",
+            "action": "Consider MSME Registration",
+            "reason": "MSME registration is recommended for the prototype business profile.",
+            "next_step": "Complete applicable MSME registration and upload the certificate."
+        }
+    }
+}

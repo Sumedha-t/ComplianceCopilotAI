@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from models.session_context import SessionContext
+
 from utils.document_loader import DocumentLoader
 from utils.entity_extractor import EntityExtractor
 
@@ -19,14 +20,21 @@ class DocumentIntelligenceAgent:
         file_path: str,
     ):
 
-        raw_text = self.loader.load(file_path)
+        raw_text = self.loader.load(
+            file_path
+        )
 
-        entities = self.extractor.extract(raw_text)
+        entities = self.extractor.extract(
+            raw_text
+        )
 
         context.add_uploaded_document(
             {
                 "filename": Path(file_path).name,
-                "status": "processed"
+                "status": "processed",
+                "document_type": entities.get(
+                    "document_type"
+                )
             }
         )
 

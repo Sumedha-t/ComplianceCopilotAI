@@ -1,0 +1,26 @@
+{
+    "updates": [
+        {
+            "update_id": "REG-001",
+            "authority": "Karnataka Pollution Control Board",
+            "title": "Updated pollution control requirements for manufacturing businesses",
+            "effective_date": "2026-09-01",
+            "affected_state": "Karnataka",
+            "affected_industry": "Manufacturing",
+            "affected_document": "Pollution Control Certificate",
+            "severity": "High",
+            "change_summary": "Updated pollution control compliance requirements may require affected manufacturing businesses to review and renew applicable environmental approvals."
+        },
+        {
+            "update_id": "REG-002",
+            "authority": "Karnataka Fire and Emergency Services",
+            "title": "Updated fire safety compliance requirements for industrial facilities",
+            "effective_date": "2026-10-01",
+            "affected_state": "Karnataka",
+            "affected_industry": "Manufacturing",
+            "affected_document": "Fire NOC",
+            "severity": "High",
+            "change_summary": "Updated fire safety requirements require affected industrial facilities to review their current fire safety approvals."
+        }
+    ]
+}

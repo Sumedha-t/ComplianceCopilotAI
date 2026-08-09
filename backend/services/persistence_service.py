@@ -12,7 +12,6 @@ from models.database_models import (
 class PersistenceService:
 
     def _clean_company_name(self, company_name):
-
         if not company_name:
             return "Unknown Company"
 
@@ -25,7 +24,6 @@ class PersistenceService:
         ]
 
         for pattern in patterns:
-
             company_name = re.sub(
                 pattern,
                 "",
@@ -33,17 +31,42 @@ class PersistenceService:
                 flags=re.IGNORECASE
             )
 
-        company_name = company_name.strip(
-            " .,:;-"
-        )
+        return company_name.strip(" .,:;-")
 
-        return company_name
+    def load_company_context(self, db, company_name=None, cin=None):
 
-    def save_session(
-        self,
-        db,
-        context
-    ):
+        query = db.query(Company)
+
+        if cin:
+            company = query.filter(
+                Company.cin == cin
+            ).first()
+
+        elif company_name:
+            clean_name = self._clean_company_name(
+                company_name
+            )
+
+            company = query.filter(
+                Company.company_name == clean_name
+            ).first()
+
+        else:
+            company = None
+
+        if not company:
+            return None
+
+        documents = db.query(Document).filter(
+            Document.company_id == company.id
+        ).all()
+
+        return {
+            "company": company,
+            "documents": documents
+        }
+
+    def save_session(self, db, context):
 
         entities = context.document_entities
 
@@ -51,27 +74,30 @@ class PersistenceService:
             entities.get("company_name")
         )
 
-        company = (
-            db.query(Company)
-            .filter(
-                Company.company_name == company_name
-            )
-            .first()
-        )
+        company = db.query(Company).filter(
+            Company.company_name == company_name
+        ).first()
 
         if not company:
-
             company = Company(
                 company_name=company_name,
                 cin=entities.get("cin"),
                 pan=entities.get("pan"),
-                gstin=entities.get("gstin")
+                gstin=entities.get("gstin"),
+                business_type=entities.get("business_type"),
+                industry=entities.get(
+                    "industry",
+                    "Manufacturing"
+                ),
+                state=entities.get(
+                    "state",
+                    "Karnataka"
+                )
             )
 
             db.add(company)
 
         else:
-
             if entities.get("cin"):
                 company.cin = entities["cin"]
 
@@ -81,23 +107,32 @@ class PersistenceService:
             if entities.get("gstin"):
                 company.gstin = entities["gstin"]
 
+            if entities.get("business_type"):
+                company.business_type = (
+                    entities["business_type"]
+                )
+
+            if entities.get("industry"):
+                company.industry = entities["industry"]
+            elif not company.industry:
+                company.industry = "Manufacturing"
+
+            if entities.get("state"):
+                company.state = entities["state"]
+            elif not company.state:
+                company.state = "Karnataka"
+
         db.commit()
         db.refresh(company)
 
         for document_data in context.uploaded_documents:
 
-            filename = document_data.get(
-                "filename"
-            )
+            filename = document_data.get("filename")
 
-            existing_document = (
-                db.query(Document)
-                .filter(
-                    Document.company_id == company.id,
-                    Document.filename == filename
-                )
-                .first()
-            )
+            existing_document = db.query(Document).filter(
+                Document.company_id == company.id,
+                Document.filename == filename
+            ).first()
 
             if existing_document:
                 continue
@@ -124,92 +159,73 @@ class PersistenceService:
         report = context.compliance_report
 
         if report:
-
-            existing_report = (
-                db.query(ComplianceReport)
-                .filter(
-                    ComplianceReport.company_id
-                    == company.id
-                )
-                .order_by(
-                    ComplianceReport.id.desc()
-                )
-                .first()
-            )
+            existing_report = db.query(
+                ComplianceReport
+            ).filter(
+                ComplianceReport.company_id == company.id
+            ).order_by(
+                ComplianceReport.id.desc()
+            ).first()
 
             if existing_report:
+                existing_report.compliance_score = report.get(
+                    "compliance_score",
+                    0
+                )
 
-                existing_report.compliance_score = (
+                existing_report.risk_level = report.get(
+                    "risk_level",
+                    "Unknown"
+                )
+
+                existing_report.present_documents = json.dumps(
                     report.get(
-                        "compliance_score",
-                        0
+                        "present_documents",
+                        []
                     )
                 )
 
-                existing_report.risk_level = (
+                existing_report.missing_documents = json.dumps(
                     report.get(
-                        "risk_level",
-                        "Unknown"
+                        "missing_documents",
+                        []
                     )
                 )
 
-                existing_report.present_documents = (
-                    json.dumps(
-                        report.get(
-                            "present_documents",
-                            []
-                        )
-                    )
-                )
-
-                existing_report.missing_documents = (
-                    json.dumps(
-                        report.get(
-                            "missing_documents",
-                            []
-                        )
-                    )
-                )
-
-                existing_report.findings = (
-                    json.dumps(
-                        report.get(
-                            "findings",
-                            []
-                        )
+                existing_report.findings = json.dumps(
+                    report.get(
+                        "findings",
+                        []
                     )
                 )
 
             else:
-
-                compliance_report = (
-                    ComplianceReport(
-                        company_id=company.id,
-                        compliance_score=report.get(
-                            "compliance_score",
-                            0
-                        ),
-                        risk_level=report.get(
-                            "risk_level",
-                            "Unknown"
-                        ),
-                        present_documents=json.dumps(
-                            report.get(
-                                "present_documents",
-                                []
-                            )
-                        ),
-                        missing_documents=json.dumps(
-                            report.get(
-                                "missing_documents",
-                                []
-                            )
-                        ),
-                        findings=json.dumps(
-                            report.get(
-                                "findings",
-                                []
-                            )
+                compliance_report = ComplianceReport(
+                    company_id=company.id,
+                    compliance_score=report.get(
+                        "compliance_score",
+                        0
+                    ),
+                    risk_level=report.get(
+                        "risk_level",
+                        "Unknown"
+                    ),
+                    present_documents=json.dumps(
+                        report.get(
+                            "present_documents",
+                            []
+                        )
+                    ),
+                    missing_documents=json.dumps(
+                        report.get(
+                            "missing_documents",
+                            []
+                        )
+                    ),
+                    findings=json.dumps(
+                        report.get(
+                            "findings",
+                            []
                         )
                     )
                 )
@@ -225,7 +241,6 @@ class PersistenceService:
         )
 
         for recommendation_data in context.recommendations:
-
             recommendation = Recommendation(
                 company_id=company.id,
                 document=recommendation_data.get(
@@ -253,45 +268,3 @@ class PersistenceService:
         db.refresh(company)
 
         return company
-    def load_company_context(self, db, company_name=None, cin=None):
-
-        query = db.query(Company)
-
-        if cin:
-            company = (
-                query
-                .filter(Company.cin == cin)
-                .first()
-            )
-
-        elif company_name:
-            clean_name = self._clean_company_name(
-                company_name
-            )
-
-            company = (
-                query
-                .filter(
-                    Company.company_name == clean_name
-                )
-                .first()
-            )
-
-        else:
-            company = None
-
-        if not company:
-            return None
-
-        documents = (
-            db.query(Document)
-            .filter(
-                Document.company_id == company.id
-            )
-            .all()
-        )
-
-        return {
-            "company": company,
-            "documents": documents
-        }

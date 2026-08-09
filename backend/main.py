@@ -10,6 +10,7 @@ from models.document import Document
 from models.compliance import Compliance
 from models.recommendation import Recommendation
 from models.lawyer_note import LawyerNote
+from routes.regulatory import router as regulatory_router
 
 app = FastAPI(
     title="Compliance Copilot AI",
@@ -36,3 +37,4 @@ def health():
     }
 Base.metadata.create_all(bind=engine)
 app.include_router(document_router)
+app.include_router(regulatory_router)

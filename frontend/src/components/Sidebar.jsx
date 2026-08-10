@@ -6,16 +6,32 @@ import {
   Settings,
   Scale,
   Activity,
+  Building2,
+  Users,
 } from "lucide-react";
 
-import { NavLink } from "react-router-dom";
+import {
+  NavLink,
+  useLocation,
+} from "react-router-dom";
 
 function Sidebar() {
-  const navigation = [
+  const location = useLocation();
+
+  const isLawyerArea =
+    location.pathname.startsWith("/lawyer-dashboard") ||
+    location.pathname.startsWith("/clients");
+
+  const clientNavigation = [
     {
-      name: "Dashboard",
-      path: "/",
+      name: "Compliance Copilot",
+      path: "/compliance-copilot",
       icon: LayoutDashboard,
+    },
+    {
+      name: "New Business",
+      path: "/new-business",
+      icon: Building2,
     },
     {
       name: "Documents",
@@ -32,15 +48,37 @@ function Sidebar() {
       path: "/recommendations",
       icon: Lightbulb,
     },
+  ];
+
+  const lawyerNavigation = [
     {
-      name: "Settings",
-      path: "/settings",
-      icon: Settings,
+      name: "Lawyer Dashboard",
+      path: "/lawyer-dashboard",
+      icon: LayoutDashboard,
+    },
+    {
+      name: "Clients",
+      path: "/clients",
+      icon: Users,
+    },
+    {
+      name: "Compliance Issues",
+      path: "/issues",
+      icon: AlertTriangle,
+    },
+    {
+      name: "Recommendations",
+      path: "/recommendations",
+      icon: Lightbulb,
     },
   ];
 
+  const navigation = isLawyerArea
+    ? lawyerNavigation
+    : clientNavigation;
+
   return (
-    <aside className="w-64 min-h-screen bg-white border-r border-gray-200 flex flex-col">
+    <aside className="w-64 shrink-0 min-h-screen bg-white border-r border-gray-100 flex flex-col">
 
       {/* Logo */}
       <div className="px-6 py-6">
@@ -67,11 +105,11 @@ function Sidebar() {
 
       </div>
 
-      {/* Navigation */}
+      {/* Workspace Label */}
       <nav className="px-4 space-y-1 flex-1">
 
         <p className="px-3 mb-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
-          Workspace
+          {isLawyerArea ? "Lawyer Workspace" : "Workspace"}
         </p>
 
         {navigation.map((item) => {
@@ -85,14 +123,14 @@ function Sidebar() {
                 `group flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                   isActive
                     ? "bg-blue-50 text-blue-700 shadow-sm"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 hover:translate-x-0.5"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                 }`
               }
             >
               {({ isActive }) => (
                 <>
                   <Icon
-                    className={`w-5 h-5 transition-transform duration-200 ${
+                    className={`w-5 h-5 transition-colors ${
                       isActive
                         ? "text-blue-600"
                         : "text-gray-400 group-hover:text-gray-600"
@@ -124,6 +162,7 @@ function Sidebar() {
             </div>
 
             <div>
+
               <p className="text-xs font-semibold text-gray-700">
                 AI SYSTEM
               </p>
@@ -137,6 +176,7 @@ function Sidebar() {
                 </span>
 
               </div>
+
             </div>
 
           </div>

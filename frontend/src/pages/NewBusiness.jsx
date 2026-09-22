@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import {
   Building2,
   Factory,
@@ -8,10 +9,19 @@ import {
   UserRound,
   ArrowRight,
   Loader2,
+  ArrowLeft,
+  ArrowLeftRight,
 } from "lucide-react";
+
+import { useNavigate } from "react-router-dom";
+
 import api from "../services/api";
 
+
 function NewBusiness() {
+
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     company_name: "",
     industry: "",
@@ -25,7 +35,13 @@ function NewBusiness() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
 
+
+  // ==================================================
+  // FORM CHANGE
+  // ==================================================
+
   const handleChange = (event) => {
+
     const { name, value } = event.target;
 
     setFormData((current) => ({
@@ -34,13 +50,20 @@ function NewBusiness() {
     }));
   };
 
+
+  // ==================================================
+  // SUBMIT CONSULTATION
+  // ==================================================
+
   const handleSubmit = async (event) => {
+
     event.preventDefault();
 
     setError("");
     setIsLoading(true);
 
     try {
+
       const response = await api.post(
         "/consultation/new",
         {
@@ -54,29 +77,102 @@ function NewBusiness() {
       );
 
       setResult(response.data.data);
+
     } catch (error) {
+
       console.error("Consultation error:", error);
 
       setError(
         "Unable to complete the consultation. Please check that the backend is running and try again."
       );
+
     } finally {
+
       setIsLoading(false);
+
     }
   };
 
+
+  // ==================================================
+  // RESET
+  // ==================================================
+
   const resetConsultation = () => {
+
     setResult(null);
     setError("");
+
   };
 
+
+  // ==================================================
+  // CLIENT WORKSPACE
+  // ==================================================
+
+  const goToClientWorkspace = () => {
+
+    localStorage.setItem("workspaceRole", "client");
+
+    navigate("/business-selection");
+
+  };
+
+
+  // ==================================================
+  // LAWYER WORKSPACE
+  // ==================================================
+
+  const goToLawyerWorkspace = () => {
+
+    localStorage.setItem("workspaceRole", "lawyer");
+
+    navigate("/lawyer-dashboard");
+
+  };
+
+
+  // ==================================================
+  // RESULT VIEW
+  // ==================================================
+
   if (result) {
+
     return (
       <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
+
         <div className="max-w-6xl mx-auto">
 
-          {/* Header */}
+          {/* TOP NAVIGATION */}
+
+          <div className="flex items-center justify-between mb-5">
+
+            <button
+              type="button"
+              onClick={goToClientWorkspace}
+              className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-blue-600 transition"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Business Selection
+            </button>
+
+
+            <button
+              type="button"
+              onClick={goToLawyerWorkspace}
+              className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition"
+            >
+              Switch to Lawyer
+              <ArrowLeftRight className="w-4 h-4" />
+            </button>
+
+          </div>
+
+
+          {/* HEADER */}
+
           <div>
+
             <p className="text-sm font-semibold text-blue-600 uppercase tracking-wide">
               New Business Readiness
             </p>
@@ -88,17 +184,22 @@ function NewBusiness() {
             <p className="text-gray-500 mt-1">
               Initial compliance assessment based on your business profile.
             </p>
+
           </div>
 
-          {/* Recommended Structure */}
+
+          {/* RECOMMENDED STRUCTURE */}
+
           <div className="mt-8 bg-white rounded-2xl shadow-md p-6">
 
             <div className="flex items-center gap-3">
+
               <div className="bg-blue-50 p-2.5 rounded-xl">
                 <Building2 className="w-6 h-6 text-blue-600" />
               </div>
 
               <div>
+
                 <p className="text-sm text-gray-500">
                   Recommended Business Structure
                 </p>
@@ -106,10 +207,14 @@ function NewBusiness() {
                 <h2 className="text-xl font-bold text-gray-800 mt-1">
                   {result.recommended_structure}
                 </h2>
+
               </div>
+
             </div>
 
+
             <div className="mt-5 bg-blue-50 rounded-xl p-4">
+
               <p className="text-sm font-semibold text-blue-800">
                 Why this structure?
               </p>
@@ -117,14 +222,18 @@ function NewBusiness() {
               <p className="text-sm text-blue-700 mt-1">
                 {result.reason}
               </p>
+
             </div>
 
           </div>
 
-          {/* Compliance Sections */}
+
+          {/* REGISTRATIONS + INDUSTRY */}
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
 
-            {/* Required Registrations */}
+            {/* REQUIRED REGISTRATIONS */}
+
             <div className="bg-white rounded-2xl shadow-md p-6">
 
               <h2 className="text-lg font-semibold text-gray-800">
@@ -135,20 +244,26 @@ function NewBusiness() {
 
                 {result.required_registrations?.map(
                   (item, index) => (
+
                     <div
                       key={index}
                       className="flex items-center gap-3"
                     >
+
                       <div className="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center">
+
                         <span className="text-green-600 text-sm">
                           ✓
                         </span>
+
                       </div>
 
                       <span className="text-sm text-gray-700">
                         {item}
                       </span>
+
                     </div>
+
                   )
                 )}
 
@@ -156,35 +271,45 @@ function NewBusiness() {
 
             </div>
 
-            {/* Industry Compliance */}
+
+            {/* INDUSTRY COMPLIANCE */}
+
             <div className="bg-white rounded-2xl shadow-md p-6">
 
               <div className="flex items-center gap-3">
+
                 <Factory className="w-5 h-5 text-amber-500" />
 
                 <h2 className="text-lg font-semibold text-gray-800">
                   Industry Compliance
                 </h2>
+
               </div>
 
               <div className="mt-5 space-y-3">
 
                 {result.industry_compliance?.map(
                   (item, index) => (
+
                     <div
                       key={index}
                       className="flex items-center gap-3"
                     >
+
                       <div className="w-6 h-6 rounded-full bg-amber-50 flex items-center justify-center">
+
                         <span className="text-amber-600 text-sm">
                           !
                         </span>
+
                       </div>
 
                       <span className="text-sm text-gray-700">
                         {item}
                       </span>
+
                     </div>
+
                   )
                 )}
 
@@ -194,7 +319,9 @@ function NewBusiness() {
 
           </div>
 
-          {/* State Compliance */}
+
+          {/* STATE COMPLIANCE */}
+
           <div className="mt-6 bg-white rounded-2xl shadow-md p-6">
 
             <div className="flex items-center gap-3">
@@ -213,14 +340,18 @@ function NewBusiness() {
 
               {result.state_compliance?.map(
                 (item, index) => (
+
                   <div
                     key={index}
                     className="bg-purple-50 rounded-xl p-4"
                   >
+
                     <p className="text-sm text-purple-800">
                       {item}
                     </p>
+
                   </div>
+
                 )
               )}
 
@@ -228,7 +359,9 @@ function NewBusiness() {
 
           </div>
 
-          {/* Checklist */}
+
+          {/* CHECKLIST */}
+
           <div className="mt-6 bg-white rounded-2xl shadow-md p-6">
 
             <h2 className="text-lg font-semibold text-gray-800">
@@ -243,16 +376,20 @@ function NewBusiness() {
 
               {result.initial_compliance_checklist?.map(
                 (item, index) => (
+
                   <div
                     key={index}
                     className="flex items-center gap-3 border border-gray-100 rounded-xl p-3"
                   >
-                    <span className="w-2 h-2 bg-blue-500 rounded-full shrink-0"></span>
+
+                    <span className="w-2 h-2 bg-blue-500 rounded-full shrink-0" />
 
                     <span className="text-sm text-gray-700">
                       {item}
                     </span>
+
                   </div>
+
                 )
               )}
 
@@ -260,7 +397,9 @@ function NewBusiness() {
 
           </div>
 
-          {/* Next Steps */}
+
+          {/* NEXT STEPS */}
+
           <div className="mt-6 bg-white rounded-2xl shadow-md p-6">
 
             <h2 className="text-lg font-semibold text-gray-800">
@@ -271,6 +410,7 @@ function NewBusiness() {
 
               {result.next_steps?.map(
                 (step, index) => (
+
                   <div
                     key={index}
                     className="flex gap-4"
@@ -285,6 +425,7 @@ function NewBusiness() {
                     </p>
 
                   </div>
+
                 )
               )}
 
@@ -292,29 +433,76 @@ function NewBusiness() {
 
           </div>
 
-          {/* Actions */}
+
+          {/* ACTIONS */}
+
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
 
             <button
+              type="button"
               onClick={resetConsultation}
               className="px-5 py-2.5 rounded-lg border border-gray-200 bg-white text-gray-700 font-medium hover:bg-gray-50 transition"
             >
               Start New Consultation
             </button>
 
+            <button
+              type="button"
+              onClick={goToClientWorkspace}
+              className="px-5 py-2.5 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition flex items-center justify-center gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Business Selection
+            </button>
+
           </div>
 
         </div>
+
       </div>
     );
   }
 
+
+  // ==================================================
+  // CONSULTATION FORM
+  // ==================================================
+
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
+
       <div className="max-w-4xl mx-auto">
 
-        {/* Header */}
+        {/* TOP NAVIGATION */}
+
+        <div className="flex items-center justify-between mb-5">
+
+          <button
+            type="button"
+            onClick={goToClientWorkspace}
+            className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-blue-600 transition"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Business Selection
+          </button>
+
+
+          <button
+            type="button"
+            onClick={goToLawyerWorkspace}
+            className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition"
+          >
+            Switch to Lawyer
+            <ArrowLeftRight className="w-4 h-4" />
+          </button>
+
+        </div>
+
+
+        {/* HEADER */}
+
         <div>
+
           <p className="text-sm font-semibold text-blue-600 uppercase tracking-wide">
             New Business
           </p>
@@ -327,9 +515,12 @@ function NewBusiness() {
             Tell us about your business and we'll generate an initial
             compliance readiness plan.
           </p>
+
         </div>
 
-        {/* Form */}
+
+        {/* FORM */}
+
         <form
           onSubmit={handleSubmit}
           className="mt-8 bg-white rounded-2xl shadow-md p-6"
@@ -337,7 +528,8 @@ function NewBusiness() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-            {/* Company Name */}
+            {/* COMPANY NAME */}
+
             <div className="md:col-span-2">
 
               <label className="text-sm font-medium text-gray-700">
@@ -362,7 +554,9 @@ function NewBusiness() {
 
             </div>
 
-            {/* Industry */}
+
+            {/* INDUSTRY */}
+
             <div>
 
               <label className="text-sm font-medium text-gray-700">
@@ -380,6 +574,7 @@ function NewBusiness() {
                   required
                   className="w-full border border-gray-200 rounded-lg pl-10 pr-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 bg-white"
                 >
+
                   <option value="">
                     Select industry
                   </option>
@@ -411,13 +606,16 @@ function NewBusiness() {
                   <option value="Other">
                     Other
                   </option>
+
                 </select>
 
               </div>
 
             </div>
 
-            {/* State */}
+
+            {/* STATE */}
+
             <div>
 
               <label className="text-sm font-medium text-gray-700">
@@ -435,6 +633,7 @@ function NewBusiness() {
                   required
                   className="w-full border border-gray-200 rounded-lg pl-10 pr-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 bg-white"
                 >
+
                   <option value="">
                     Select state
                   </option>
@@ -470,13 +669,16 @@ function NewBusiness() {
                   <option value="Other">
                     Other
                   </option>
+
                 </select>
 
               </div>
 
             </div>
 
-            {/* Founders */}
+
+            {/* FOUNDERS */}
+
             <div>
 
               <label className="text-sm font-medium text-gray-700">
@@ -502,7 +704,9 @@ function NewBusiness() {
 
             </div>
 
-            {/* Employees */}
+
+            {/* EMPLOYEES */}
+
             <div>
 
               <label className="text-sm font-medium text-gray-700">
@@ -528,7 +732,9 @@ function NewBusiness() {
 
             </div>
 
-            {/* Turnover */}
+
+            {/* TURNOVER */}
+
             <div className="md:col-span-2">
 
               <label className="text-sm font-medium text-gray-700">
@@ -560,8 +766,11 @@ function NewBusiness() {
 
           </div>
 
-          {/* Error */}
+
+          {/* ERROR */}
+
           {error && (
+
             <div className="mt-5 bg-red-50 border border-red-200 rounded-xl p-4">
 
               <p className="text-sm text-red-700">
@@ -569,9 +778,12 @@ function NewBusiness() {
               </p>
 
             </div>
+
           )}
 
-          {/* Submit */}
+
+          {/* SUBMIT */}
+
           <button
             type="submit"
             disabled={isLoading}
@@ -583,15 +795,19 @@ function NewBusiness() {
           >
 
             {isLoading ? (
+
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
                 Preparing your compliance assessment...
               </>
+
             ) : (
+
               <>
                 Generate Compliance Readiness Plan
                 <ArrowRight className="w-5 h-5" />
               </>
+
             )}
 
           </button>
@@ -599,6 +815,7 @@ function NewBusiness() {
         </form>
 
       </div>
+
     </div>
   );
 }

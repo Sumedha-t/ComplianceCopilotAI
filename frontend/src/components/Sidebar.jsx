@@ -3,35 +3,69 @@ import {
   FileText,
   AlertTriangle,
   Lightbulb,
-  Settings,
   Scale,
   Activity,
-  Building2,
   Users,
+  ArrowLeftRight,
 } from "lucide-react";
 
-import {
-  NavLink,
-  useLocation,
-} from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 
 function Sidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
 
-  const isLawyerArea =
-    location.pathname.startsWith("/lawyer-dashboard") ||
-    location.pathname.startsWith("/clients");
+  const pathname = location.pathname;
+
+  // --------------------------------------------------
+  // NEW BUSINESS HAS NO SIDEBAR
+  // --------------------------------------------------
+  if (pathname.startsWith("/new-business")) {
+    return null;
+  }
+
+  // --------------------------------------------------
+  // WORKSPACE ROLE
+  //
+  // Lawyer-specific routes automatically establish
+  // lawyer mode.
+  //
+  // Client-specific routes automatically establish
+  // client mode.
+  //
+  // Shared routes (/issues, /recommendations) use
+  // localStorage so the selected role is preserved.
+  // --------------------------------------------------
+
+  const savedRole = localStorage.getItem("workspaceRole");
+
+  let isLawyerArea = savedRole === "lawyer";
+
+  if (
+    pathname.startsWith("/lawyer-dashboard") ||
+    pathname.startsWith("/clients")
+  ) {
+    isLawyerArea = true;
+    localStorage.setItem("workspaceRole", "lawyer");
+  }
+
+  if (
+    pathname.startsWith("/compliance-copilot") ||
+    pathname.startsWith("/documents")
+  ) {
+    isLawyerArea = false;
+    localStorage.setItem("workspaceRole", "client");
+  }
+
+  // --------------------------------------------------
+  // CLIENT NAVIGATION
+  // --------------------------------------------------
 
   const clientNavigation = [
     {
       name: "Compliance Copilot",
       path: "/compliance-copilot",
       icon: LayoutDashboard,
-    },
-    {
-      name: "New Business",
-      path: "/new-business",
-      icon: Building2,
     },
     {
       name: "Documents",
@@ -49,6 +83,10 @@ function Sidebar() {
       icon: Lightbulb,
     },
   ];
+
+  // --------------------------------------------------
+  // LAWYER NAVIGATION
+  // --------------------------------------------------
 
   const lawyerNavigation = [
     {
@@ -77,10 +115,27 @@ function Sidebar() {
     ? lawyerNavigation
     : clientNavigation;
 
+  // --------------------------------------------------
+  // SWITCH ROLE
+  // --------------------------------------------------
+
+  const handleSwitchWorkspace = () => {
+    if (isLawyerArea) {
+      localStorage.setItem("workspaceRole", "client");
+      navigate("/compliance-copilot");
+    } else {
+      localStorage.setItem("workspaceRole", "lawyer");
+      navigate("/lawyer-dashboard");
+    }
+  };
+
   return (
     <aside className="w-64 shrink-0 min-h-screen bg-white border-r border-gray-100 flex flex-col">
 
-      {/* Logo */}
+      {/* ==================================================
+          LOGO
+      ================================================== */}
+
       <div className="px-6 py-6">
 
         <div className="flex items-center gap-3">
@@ -101,11 +156,15 @@ function Sidebar() {
 
         </div>
 
-        <div className="mt-6 h-px bg-gray-100"></div>
+        <div className="mt-6 h-px bg-gray-100" />
 
       </div>
 
-      {/* Workspace Label */}
+
+      {/* ==================================================
+          NAVIGATION
+      ================================================== */}
+
       <nav className="px-4 space-y-1 flex-1">
 
         <p className="px-3 mb-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
@@ -140,7 +199,7 @@ function Sidebar() {
                   <span>{item.name}</span>
 
                   {isActive && (
-                    <span className="ml-auto w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
+                    <span className="ml-auto w-1.5 h-1.5 bg-blue-600 rounded-full" />
                   )}
                 </>
               )}
@@ -150,7 +209,34 @@ function Sidebar() {
 
       </nav>
 
-      {/* AI System Status */}
+
+      {/* ==================================================
+          SWITCH ROLE
+      ================================================== */}
+
+      <div className="px-4 pb-4">
+
+        <button
+          type="button"
+          onClick={handleSwitchWorkspace}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition text-sm font-medium"
+        >
+          <ArrowLeftRight className="w-4 h-4 text-gray-400" />
+
+          <span>
+            {isLawyerArea
+              ? "Switch to Client"
+              : "Switch to Lawyer"}
+          </span>
+        </button>
+
+      </div>
+
+
+      {/* ==================================================
+          AI SYSTEM STATUS
+      ================================================== */}
+
       <div className="px-4 pb-5">
 
         <div className="rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-white p-4">
@@ -169,7 +255,7 @@ function Sidebar() {
 
               <div className="flex items-center gap-1.5 mt-0.5">
 
-                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                <span className="w-2 h-2 bg-green-500 rounded-full" />
 
                 <span className="text-xs font-medium text-green-600">
                   Operational

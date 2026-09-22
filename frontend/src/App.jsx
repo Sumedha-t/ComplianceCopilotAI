@@ -16,145 +16,184 @@ import Dashboard from "./pages/Dashboard";
 import Documents from "./pages/Documents";
 import Issues from "./pages/Issues";
 import Recommendations from "./pages/Recommendations";
-import Settings from "./pages/Settings";
 
 import NewBusiness from "./pages/NewBusiness";
 import Clients from "./pages/Clients";
 import ClientDashboard from "./pages/ClientDashboard";
 
+
+// ==================================================
+// NORMAL WORKSPACE LAYOUT
+// ==================================================
+
+function WorkspaceLayout({ children }) {
+  return (
+    <div className="flex min-h-screen">
+
+      <Sidebar />
+
+      <main className="flex-1 min-w-0">
+        {children}
+      </main>
+
+    </div>
+  );
+}
+
+
+// ==================================================
+// NEW BUSINESS LAYOUT
+// No sidebar intentionally.
+// ==================================================
+
+function NewBusinessLayout() {
+  return (
+    <div className="min-h-screen">
+      <NewBusiness />
+    </div>
+  );
+}
+
+
+// ==================================================
+// APP
+// ==================================================
+
 function App() {
   return (
     <BrowserRouter>
+
       <Routes>
 
-        {/* Login */}
+        {/* ==============================================
+            LOGIN
+        ============================================== */}
+
         <Route
           path="/"
           element={<Login />}
         />
 
-        {/* Client business selection */}
+
+        {/* ==============================================
+            BUSINESS SELECTION
+        ============================================== */}
+
         <Route
           path="/business-selection"
           element={<BusinessSelection />}
         />
 
-        {/* New Business */}
+
+        {/* ==============================================
+            NEW BUSINESS
+        ============================================== */}
+
         <Route
           path="/new-business"
-          element={<NewBusiness />}
+          element={<NewBusinessLayout />}
         />
 
-        {/* Existing Business / Compliance Copilot */}
+
+        {/* ==============================================
+            CLIENT - COMPLIANCE COPILOT
+        ============================================== */}
+
         <Route
           path="/compliance-copilot"
           element={
-            <div className="flex min-h-screen">
-              <Sidebar />
-
-              <main className="flex-1 min-w-0">
-                <Dashboard />
-              </main>
-            </div>
+            <WorkspaceLayout>
+              <Dashboard />
+            </WorkspaceLayout>
           }
         />
 
-        {/* Lawyer Dashboard */}
-        <Route
-          path="/lawyer-dashboard"
-          element={
-            <div className="flex min-h-screen">
-              <Sidebar />
 
-              <main className="flex-1 min-w-0">
-                <LawyerDashboard />
-              </main>
-            </div>
-          }
-        />
+        {/* ==============================================
+            DOCUMENTS
+        ============================================== */}
 
-        {/* Lawyer Client List */}
-        <Route
-          path="/clients"
-          element={
-            <div className="flex min-h-screen">
-              <Sidebar />
-
-              <main className="flex-1 min-w-0">
-                <Clients />
-              </main>
-            </div>
-          }
-        />
-
-        {/* Individual Client Dashboard */}
-        <Route
-          path="/clients/:id"
-          element={
-            <div className="flex min-h-screen">
-              <Sidebar />
-
-              <main className="flex-1 min-w-0">
-                <ClientDashboard />
-              </main>
-            </div>
-          }
-        />
-
-        {/* Existing pages */}
         <Route
           path="/documents"
           element={
-            <div className="flex min-h-screen">
-              <Sidebar />
-
-              <main className="flex-1 min-w-0">
-                <Documents />
-              </main>
-            </div>
+            <WorkspaceLayout>
+              <Documents />
+            </WorkspaceLayout>
           }
         />
+
+
+        {/* ==============================================
+            COMPLIANCE ISSUES
+        ============================================== */}
 
         <Route
           path="/issues"
           element={
-            <div className="flex min-h-screen">
-              <Sidebar />
-
-              <main className="flex-1 min-w-0">
-                <Issues />
-              </main>
-            </div>
+            <WorkspaceLayout>
+              <Issues />
+            </WorkspaceLayout>
           }
         />
+
+
+        {/* ==============================================
+            RECOMMENDATIONS
+        ============================================== */}
 
         <Route
           path="/recommendations"
           element={
-            <div className="flex min-h-screen">
-              <Sidebar />
-
-              <main className="flex-1 min-w-0">
-                <Recommendations />
-              </main>
-            </div>
+            <WorkspaceLayout>
+              <Recommendations />
+            </WorkspaceLayout>
           }
         />
 
-        <Route
-          path="/settings"
-          element={
-            <div className="flex min-h-screen">
-              <Sidebar />
 
-              <main className="flex-1 min-w-0">
-                <Settings />
-              </main>
-            </div>
+        {/* ==============================================
+            LAWYER DASHBOARD
+        ============================================== */}
+
+        <Route
+          path="/lawyer-dashboard"
+          element={
+            <WorkspaceLayout>
+              <LawyerDashboard />
+            </WorkspaceLayout>
+          }
+        />
+
+
+        {/* ==============================================
+            LAWYER CLIENTS
+        ============================================== */}
+
+        <Route
+          path="/clients"
+          element={
+            <WorkspaceLayout>
+              <Clients />
+            </WorkspaceLayout>
+          }
+        />
+
+
+        {/* ==============================================
+            INDIVIDUAL CLIENT
+        ============================================== */}
+
+        <Route
+          path="/clients/:id"
+          element={
+            <WorkspaceLayout>
+              <ClientDashboard />
+            </WorkspaceLayout>
           }
         />
 
       </Routes>
+
     </BrowserRouter>
   );
 }
